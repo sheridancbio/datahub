@@ -47,7 +47,7 @@ jobs:
         aws s3 cp --acl public-read ${STUDY_LIST_FILENAME} s3://${AWS_S3_BUCKET}/
         rm -f ${STUDY_LIST_FILENAME}
         # first save .git
-        tar -cvf ${SAVED_GIT_REPO_FILENAME} .git
+        tar -cvf ${SAVED_GIT_REPO_FILENAME} .git > /dev/null
         mkdir studies_to_upload
         cd public
         for changed_study in ${{ steps.unique_studies.outputs.unique_studies_list }}; do
@@ -66,7 +66,7 @@ jobs:
             cd ..
             rm -rf .git
             # add original .git back
-            tar -xf ${SAVED_GIT_REPO_FILENAME}
+            tar -xf ${SAVED_GIT_REPO_FILENAME} > /dev/null
             cd public
           fi
         done
