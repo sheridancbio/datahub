@@ -30,42 +30,42 @@ jobs:
         # create a list of all studies under 'public'
         echo "[" > ${STUDY_LIST_FILENAME}
         first_study=1
-        find public -type d -mindepth 1 -maxdepth 1 > ${STUDY_PATH_FILENAME}
+        find public -type d -mindepth 1 -maxdepth 1 | sort > ${STUDY_PATH_FILENAME}
         while read studypath ; do
-          echo -n "."
-          if [ $first_study -ne 1 ] ; then
+          if [ ${first_study} -ne 1 ] ; then
             echo "," >> ${STUDY_LIST_FILENAME}
           fi
           studyname="${studypath:7}"
-          echo -n "\"$studyname\"" >> ${STUDY_LIST_FILENAME}
+          echo -n "\"${studyname}\"" >> ${STUDY_LIST_FILENAME}
           first_study=0
         done < ${STUDY_PATH_FILENAME}
         echo "" >> ${STUDY_LIST_FILENAME}
         echo "]" >> ${STUDY_LIST_FILENAME}
         # copy study list file to S3
         aws s3 cp --acl public-read ${STUDY_LIST_FILENAME} s3://${AWS_S3_BUCKET}/
-        echo study_list.json
         # first save .git
         tar -cvf ${SAVED_GIT_REPO_FILENAME} .git
         mkdir studies_to_upload
         cd public
         for changed_study in ${{ steps.unique_studies.outputs.unique_studies_list }}; do
-          echo "Pulling study: ${changed_study}."
-          git lfs pull --include="${changed_study}"
-          echo "Compressing this study: ${changed_study}."
-          tar -czvf ../studies_to_upload/${changed_study}.tar.gz ${changed_study}
-          echo "Copy file to S3: ../studies_to_upload/${changed_study}.tar.gz"
-          aws s3 cp --acl public-read ../studies_to_upload/${changed_study}.tar.gz s3://${AWS_S3_BUCKET}/
-          echo "Remove this directory: ${changed_study}."
-          rm -rf "${changed_study}"
-          echo "Remove this file: ../studies_to_upload/${changed_study}.tar.gz."
-          rm ../studies_to_upload/${changed_study}.tar.gz
-          echo "Remove rm -rf .git"
-          cd ..
-          rm -rf .git
-          # add original .git back
-          tar -xf ${SAVED_GIT_REPO_FILENAME}
-          cd public
+          if [ -d "${changed_study}" ]; then
+            echo "Pulling study: ${changed_study}."
+            git lfs pull --include="${changed_study}"
+            echo "Compressing this study: ${changed_study}."
+            tar -czvf ../studies_to_upload/${changed_study}.tar.gz ${changed_study}
+            echo "Copy file to S3: ../studies_to_upload/${changed_study}.tar.gz"
+            aws s3 cp --acl public-read ../studies_to_upload/${changed_study}.tar.gz s3://${AWS_S3_BUCKET}/
+            echo "Remove this directory: ${changed_study}."
+            rm -rf "${changed_study}"
+            echo "Remove this file: ../studies_to_upload/${changed_study}.tar.gz."
+            rm ../studies_to_upload/${changed_study}.tar.gz
+            echo "Remove rm -rf .git"
+            cd ..
+            rm -rf .git
+            # add original .git back
+            tar -xf ${SAVED_GIT_REPO_FILENAME}
+            cd public
+          fi
         done
         cd ..
       env:
