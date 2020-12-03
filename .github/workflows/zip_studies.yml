@@ -7,8 +7,7 @@ on:
       - zip-study-on-push-github-action
       #### master
     paths:
-      - '**'
-      #### 'public/**'
+      - 'public/**'
 jobs:
   zip_studies:
     if: github.repository == 'sheridancbio/datahub'
