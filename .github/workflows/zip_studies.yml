@@ -26,14 +26,11 @@ jobs:
         exit 0
     - uses: actions/checkout@v2
     - run: |
-        echo printing the current shell
-        cat $0
+        # detecting modified studies and archiving them
         # create a list of all studies under 'public'
         echo "[" > ${STUDY_LIST_FILENAME}
         first_study=1
-        ####find public -type d -depth 1 > ${STUDY_PATH_FILENAME}
-        echo "public/this_is_a_study" > ${STUDY_PATH_FILENAME}
-        echo "public/this_is_also_a_study" >> ${STUDY_PATH_FILENAME}
+        find public -type d -mindepth 1 -maxdepth 1 > ${STUDY_PATH_FILENAME}
         while read studypath ; do
           echo -n "."
           if [ $first_study -ne 1 ] ; then
