@@ -26,10 +26,14 @@ jobs:
     - run: |
         # create a list of all studies under 'public'
         echo "[" > ${STUDY_LIST_FILENAME}
+        study_count=0
         for studypath in `find public -type d -depth 1`; do
-          studyname=${studypath:7}
+          echo found : $studypath
+          study_count=$(( $study_count + 1 ))
+          studyname="${studypath:7}"
           echo "\"$studyname\"," >> ${STUDY_LIST_FILENAME}
         done
+        echo study count : $study_count
         echo "]" >> ${STUDY_LIST_FILENAME}
         # copy study list file to S3
         aws s3 cp --acl public-read ${STUDY_LIST_FILENAME} s3://${AWS_S3_BUCKET}/
