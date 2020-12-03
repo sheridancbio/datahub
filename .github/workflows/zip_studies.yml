@@ -24,11 +24,14 @@ jobs:
         exit 0
     - uses: actions/checkout@v2
     - run: |
+        echo printing the current shell
+        echo $0
         # create a list of all studies under 'public'
         echo "[" > ${STUDY_LIST_FILENAME}
         first_study=1
         find public -type d -depth 1 > ${STUDY_PATH_FILENAME}
         while read studypath ; do
+          echo -n "."
           if [ $first_study -ne 1 ] ; then
             echo "," >> ${STUDY_LIST_FILENAME}
           fi
