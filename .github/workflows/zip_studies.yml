@@ -30,7 +30,7 @@ jobs:
           studyname=${studypath:7}
           echo "\"$studyname\"," >> ${STUDY_LIST_FILENAME}
         done
-        echo "]" > ${STUDY_LIST_FILENAME}
+        echo "]" >> ${STUDY_LIST_FILENAME}
         # copy study list file to S3
         aws s3 cp --acl public-read ${STUDY_LIST_FILENAME} s3://${AWS_S3_BUCKET}/
         echo study_list.json
